@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="">
+
+    <style>
+        .ret {
+            border: white 5px;
+            border-style: double;
+
+            background-color: #EDC350;
+        }
+
+
+
+
+        #liste {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            margin: 0 10vw;
+        }
+
+        img {
+            max-width: 300px;
+            display: grid;
+            margin: auto;
+        }
+
+        h3 {
+
+            font-family: serif;
+            letter-spacing: 5px;
+            font-weight: 100;
+            height: 55px;
+            background-color: #005AA5;
+            color: white;
+            text-align: center;
+            padding-top: 1%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #D83A24;
+            letter-spacing: 5px;
+            font-size: 5rem;
+
+
+        }
+
+        h2 {
+            margin: 0 10vw;
+            text-align: center;
+            letter-spacing: 10px;
+            font-family: sans-serif;
+            font-weight: 100;
+            border: white 5px;
+            border-style: double;
+            background-color: #005AA5;
+            color: white;
+            padding: 20px;
+        }
+
+        span {
+            color: #005AA5;
+            letter-spacing: -2px;
+            font-size: 3rem;
+
+        }
+
+        p {
+            font-family: sans-serif;
+            letter-spacing: 1px;
+            font-weight: 100;
+            padding: 0 5% 0;
+        }
+
+
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+
+            font-size: 1rem;
+            letter-spacing: 5px;
+            color: gray;
+            margin: 3vw;
+            box-shadow: 2px 4px rgba(237, 195, 80, 0.62);
+            border-radius: 4%;
+            font-family: sans-serif;
+            padding: 0.5vw;
+            cursor: pointer;
+            border: none;
+        }
+
+        .valgt {
+            color: #D83A24;
+            box-shadow: 2px 4px rgba(237, 195, 80, 0.62);
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 4vw;
+        }
+
+
+        #popup {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            background-color: red;
+            left: 0;
+            top: 0;
+            display: none;
+        }
+
+        #indhold {
+            box-sizing: border-box;
+            background-color: lightgray;
+            width: 90vw;
+            height: 90vh;
+            margin: auto;
+        }
+
+        #luk {
+            box-sizing: border-box;
+            text-align: right;
+            padding-right: 1em;
+        }
+
+        #luk button {
+            font-size: 2em;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="popup">
+        <div id="luk"><button>X</button></div>
+        <div id="indhold"></div>
+    </div>
+    <header>
+        <h1><span>Bistro</span> Babushka</h1>
+        <nav>
+            <button class="filter valgt" data-hold="alle">Alle</button>
+            <button class="filter" data-hold="forretter">Forretter</button>
+            <button class="filter" data-hold="hovedretter">Hovedretter</button>
+            <button class="filter" data-hold="sideorders">Tilbehør</button>
+            <button class="filter" data-hold="desserter">Desserter</button>
+            <button class="filter" data-hold="drikkevarer">Drikkevarer</button>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Alle</h2>
+        <section id="liste">
+
+        </section>
+    </main>
+
+    <footer>Bistro Babushka 123 vej 2000 Frederiksberg</footer>
+
+    <script>
+        let alleRetter = [];
+        let filter = "alle";
+
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            console.log("start");
+            let dest = document.querySelector("#liste");
+
+            async function getJson() {
+                let jsonData = await fetch("babushkajson.json");
+                alleRetter = await jsonData.json();
+                visRetter();
+            }
+
+
+            // let jsonData = await fetch("dyr.json");
+
+            //Her skal du skrive hele url'en på den konverterede "spreadsheet til JSON" fil:
+
+            function visRetter() {
+                dest.innerHTML = ""; //slet eksisterende indhold fra #liste
+                alleRetter.forEach(ret => {
+                    if (filter == "alle" || filter == ret.kategori) {
+                        let template = `
+                        <article class = "ret">
+                    <h3>${ret.navn}</h3>
+<img src = "${ret.billede}-sm.jpg" alt = "${ret.navn}"><br>
+                      <p>${ret.kort}</p>
+                        <p>Pris: <b>${ret.pris},-</b></p>
+                        </article>
+`;
+                        dest.insertAdjacentHTML("beforeend", template);
+                        dest.lastElementChild.addEventListener("click", () => {
+                            location.href = "singleview.html?id=" + ret.id;
+
+
+                            //vil browseren hente siden 06-singleview.html, og den vil desuden give siden en variabel, github, som er lig med ret.navn. Bliver fx til: location.href = "06-single.html?navn=russisk ringbrød"
+
+
+                        });
+
+                        //                        function åbn() {
+                        //                            document.querySelector("#indhold").innerHTML = `
+                        //                        <article class = "ret">
+                        //                    <h3>${ret.navn}</h3>
+                        //                        <img src = "${ret.billede}-sm.jpg" alt = "${ret.navn}"><br>
+                        //                      <p>${ret.kort}</p>
+                        //                        <p>Pris: <b>${ret.pris},-</b></p>
+                        //                        </article>
+                        //                        `;
+                        //                            document.querySelector("#popup").style.display = "block";
+                        //                        }
+                    }
+                });
+            }
+            //Visretter slut
+
+            //            document.querySelector("#luk button").addEventListener("click", () => {
+            //                document.querySelector("#popup").style.display = "none";
+            //            });
+
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.addEventListener("click", filtrering);
+            });
+
+            function filtrering() {
+                filter = this.getAttribute("data-hold");
+                document.querySelector("h2").textContent = this.textContent; //Når der klikkes på en knap, søger eventhandler-funktionen for, at h2-overskriftens indhold sættes lig med knappens tekst
+                document.querySelectorAll(".filter").forEach(aktiv => {
+                    aktiv.classList.remove("valgt");
+                });
+                this.classList.add("valgt");
+
+                visRetter();
+            }
+
+
+            getJson();
+        }
+
+
+
+
+        //        <a href="https://github.com/${person.github}">https:github.com/${person.github}</a>
+
+    </script>
+</body>
+
+</html>
